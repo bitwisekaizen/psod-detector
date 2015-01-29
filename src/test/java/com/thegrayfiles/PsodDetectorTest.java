@@ -7,6 +7,7 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.web.client.RestTemplate;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -21,7 +22,15 @@ import org.testng.annotations.Test;
 @Test
 public class PsodDetectorTest extends AbstractTestNGSpringContextTests {
 
-    public void canDetectPsod() {
-        Assert.fail("fail");
+    public void canDetectPsodOnVm() {
+        String detectedText = getPsodTextForVm("esxi-test-vm");
+
+        Assert.assertEquals(detectedText, "Hello, PSOD.");
+    }
+
+    private String getPsodTextForVm(String vm) {
+        RestTemplate template = new RestTemplate();
+        Psod psod = template.getForEntity("http://localhost:8080/psod?vm=" + vm, Psod.class).getBody();
+        return psod.getText();
     }
 }
